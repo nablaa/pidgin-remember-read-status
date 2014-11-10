@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.7)
 project(pidgin-conversation-memory)
+enable_testing()
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(PIDGIN REQUIRED pidgin)
@@ -34,3 +35,4 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-parameter")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 
 add_subdirectory(src)
+add_subdirectory(test)
