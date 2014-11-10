@@ -1,0 +1,53 @@
+cmake_minimum_required(VERSION 2.8.7)
+project(pidgin-conversation-memory)
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(PIDGIN REQUIRED pidgin)
+pkg_check_modules(LIBPURPLE REQUIRED purple)
+pkg_check_modules(GLIB REQUIRED glib-2.0)
+pkg_check_modules(GTK REQUIRED gtk+-2.0)
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-missing-braces")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-missing-field-initializers")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wformat=2")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wswitch-default")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wswitch-enum")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wcast-align")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wpointer-arith")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wbad-function-cast")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wstrict-overflow=5")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Winline")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wundef")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wnested-externs")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wcast-qual")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wshadow")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wunreachable-code")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wlogical-op")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wfloat-equal")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wstrict-aliasing=2")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wredundant-decls")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wold-style-definition")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-parameter")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
+
+include_directories(
+    ${PIDGIN_INCLUDE_DIRS}
+    ${LIBPURPLE_INCLUDE_DIRS}
+    ${GLIB2_INCLUDE_DIRS}
+    ${GTK_INCLUDE_DIRS}
+    )
+
+add_library(conv_memory SHARED conv_memory.c)
+
+target_link_libraries(conv_memory
+    ${PIDGIN_LIBRARIES}
+    ${LIBPURPLE_LIBRARIES}
+    ${GLIB2_LIBRARIES}
+    ${GTK_LIBRARIES}
+    )
+
+set(PLUGIN_INSTALL_DIR "~/.purple/plugins/")
+install(TARGETS conv_memory DESTINATION "${PLUGIN_INSTALL_DIR}")
