@@ -18,10 +18,12 @@ TEST(ConversationHistoryInitTests, init_with_null_filename_should_return_null)
 
 History *create_mock_history() {
 	History *history = (History *)malloc(sizeof(History));
+	init_hash_table(history);
 	return history;
 }
 
 void destroy_mock_history(History *history) {
+	destroy_hash_table(history);
 	free(history);
 }
 
@@ -48,4 +50,41 @@ TEST(ConversationHistoryTests, empty_history_should_not_have_unseen_messages)
 {
 	CHECK_EQUAL(false, has_conversation_unseen_messages(history, "foo", 1234));
 	CHECK_EQUAL(false, has_conversation_unseen_messages(history, "bar", 1234));
+}
+
+TEST(ConversationHistoryTests, message_with_same_timestamp_should_mean_no_unseen_messages)
+{
+	const char *name = "foo";
+	time_t time = 1234;
+	update_conversation_history(history, name, time);
+	CHECK_EQUAL(false, has_conversation_unseen_messages(history, name, time));
+}
+
+TEST(ConversationHistoryTests, message_to_different_conversation_should_mean_no_unseen_messages)
+{
+	const char *name = "foo";
+	time_t time = 1234;
+	update_conversation_history(history, "bar", 4433);
+	CHECK_EQUAL(false, has_conversation_unseen_messages(history, name, time));
+}
+
+TEST(ConversationHistoryTests, message_to_same_conversation_should_indicate_unseen_messages)
+{
+	const char *name = "foo";
+	time_t time = 1234;
+	update_conversation_history(history, name, 4433);
+	CHECK_EQUAL(true, has_conversation_unseen_messages(history, name, time));
+}
+
+TEST(ConversationHistoryTests, updating_conversation_after_unseen_messages_should_give_no_unseen_messages)
+{
+	const char *name = "foo";
+	time_t time = 1234;
+	time_t new_time = 4433;
+	update_conversation_history(history, name, new_time);
+	CHECK_EQUAL(false, has_conversation_unseen_messages(history, name, new_time));
+	CHECK_EQUAL(true, has_conversation_unseen_messages(history, name, time));
+	update_conversation_history(history, name, time);
+	CHECK_EQUAL(true, has_conversation_unseen_messages(history, name, new_time));
+	CHECK_EQUAL(false, has_conversation_unseen_messages(history, name, time));
 }
