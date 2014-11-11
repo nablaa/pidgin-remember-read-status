@@ -8,7 +8,6 @@ pkg_check_modules(LIBPURPLE REQUIRED purple)
 pkg_check_modules(GLIB REQUIRED glib-2.0)
 pkg_check_modules(GTK REQUIRED gtk+-2.0)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-missing-braces")
@@ -33,6 +32,9 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wredundant-decls")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wold-style-definition")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-parameter")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
+
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -O0 -g3 -ggdb")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS} -O2")
 
 add_subdirectory(src)
 add_subdirectory(test)
