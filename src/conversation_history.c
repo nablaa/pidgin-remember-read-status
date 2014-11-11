@@ -14,7 +14,7 @@ struct History {
 
 static void init_hash_table(History *history) {
 	assert(history != NULL);
-	history->table = g_hash_table_new(g_str_hash, g_str_equal);
+	history->table = g_hash_table_new_full(g_str_hash, g_str_equal, free, NULL);
 }
 
 static void destroy_hash_table(History *history) {

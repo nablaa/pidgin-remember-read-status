@@ -4,6 +4,10 @@ extern "C" {
 }
 
 #include <CppUTest/TestHarness.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <time.h>
 
 TEST_GROUP(ConversationHistoryInitTests)
 {
@@ -47,6 +51,14 @@ TEST_GROUP(ConversationHistoryTests)
 		fprintf(file, "%s\t%d\n", "baz", 999);
 		fclose(file);
 	}
+
+	void update_with_malloc_string(History *h, const char *name, time_t time) {
+		size_t size = strlen(name) + 1;
+		char *temp = (char *)malloc(size);
+		strncpy(temp, name, size);
+		update_conversation_history(h, temp, time);
+		// variable "temp" will be removed by hash table inside history
+	}
 };
 
 TEST(ConversationHistoryTests, has_conversation_unseen_messages_with_null_should_return_false)
@@ -65,7 +77,7 @@ TEST(ConversationHistoryTests, message_with_same_timestamp_should_mean_no_unseen
 {
 	const char *name = "foo";
 	time_t time = 1234;
-	update_conversation_history(history, name, time);
+	update_with_malloc_string(history, name, time);
 	CHECK_EQUAL(false, has_conversation_unseen_messages(history, name, time));
 }
 
@@ -73,7 +85,7 @@ TEST(ConversationHistoryTests, message_to_different_conversation_should_mean_no_
 {
 	const char *name = "foo";
 	time_t time = 1234;
-	update_conversation_history(history, "bar", 4433);
+	update_with_malloc_string(history, "bar", 4433);
 	CHECK_EQUAL(false, has_conversation_unseen_messages(history, name, time));
 }
 
@@ -81,7 +93,7 @@ TEST(ConversationHistoryTests, message_to_same_conversation_should_indicate_unse
 {
 	const char *name = "foo";
 	time_t time = 1234;
-	update_conversation_history(history, name, 4433);
+	update_with_malloc_string(history, name, 4433);
 	CHECK_EQUAL(true, has_conversation_unseen_messages(history, name, time));
 }
 
@@ -90,10 +102,10 @@ TEST(ConversationHistoryTests, updating_conversation_after_unseen_messages_shoul
 	const char *name = "foo";
 	time_t time = 1234;
 	time_t new_time = 4433;
-	update_conversation_history(history, name, new_time);
+	update_with_malloc_string(history, name, new_time);
 	CHECK_EQUAL(false, has_conversation_unseen_messages(history, name, new_time));
 	CHECK_EQUAL(true, has_conversation_unseen_messages(history, name, time));
-	update_conversation_history(history, name, time);
+	update_with_malloc_string(history, name, time);
 	CHECK_EQUAL(true, has_conversation_unseen_messages(history, name, new_time));
 	CHECK_EQUAL(false, has_conversation_unseen_messages(history, name, time));
 }
