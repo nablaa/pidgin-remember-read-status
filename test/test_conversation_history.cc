@@ -38,6 +38,15 @@ TEST_GROUP(ConversationHistoryTests)
 	void teardown() {
 		destroy_mock_history(history);
 	}
+
+	void write_test_file(const char *filename) {
+		FILE *file = fopen(filename, "w");
+		CHECK(file != NULL);
+		fprintf(file, "%s\t%d\n", "foo", 1234);
+		fprintf(file, "%s\t%d\n", "bar", 42);
+		fprintf(file, "%s\t%d\n", "baz", 999);
+		fclose(file);
+	}
 };
 
 TEST(ConversationHistoryTests, has_conversation_unseen_messages_with_null_should_return_false)
@@ -87,4 +96,18 @@ TEST(ConversationHistoryTests, updating_conversation_after_unseen_messages_shoul
 	update_conversation_history(history, name, time);
 	CHECK_EQUAL(true, has_conversation_unseen_messages(history, name, new_time));
 	CHECK_EQUAL(false, has_conversation_unseen_messages(history, name, time));
+}
+
+TEST(ConversationHistoryTests, reading_history_from_file_should_return_proper_unseen_status)
+{
+	const char *filename = "history_data";
+	write_test_file(filename);
+	CHECK_EQUAL(true, read_history_from_file(filename, history));
+	CHECK_EQUAL(false, has_conversation_unseen_messages(history, "foo", 1234));
+	CHECK_EQUAL(false, has_conversation_unseen_messages(history, "bar", 42));
+	CHECK_EQUAL(false, has_conversation_unseen_messages(history, "baz", 999));
+	CHECK_EQUAL(true, has_conversation_unseen_messages(history, "foo", 42));
+	CHECK_EQUAL(true, has_conversation_unseen_messages(history, "bar", 1234));
+	CHECK_EQUAL(true, has_conversation_unseen_messages(history, "baz", 342));
+	CHECK_EQUAL(false, has_conversation_unseen_messages(history, "none", 1234));
 }

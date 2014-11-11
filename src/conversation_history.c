@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>
 
 struct History {
 	FILE *file;
@@ -19,6 +20,28 @@ static void init_hash_table(History *history) {
 static void destroy_hash_table(History *history) {
 	g_hash_table_destroy(history->table);
 	history->table = NULL;
+}
+
+static bool read_history_from_file(const char *filename, History *history) {
+	FILE *file = fopen(filename, "r");
+	if (!file) {
+		return false;
+	}
+
+	size_t max_line_len = 1024;
+	char buffer[max_line_len];
+	while (fgets(buffer, max_line_len, file)) {
+		char *name = (char *)malloc(max_line_len);
+		time_t time;
+		int args = sscanf(buffer, "%s\t%lu", name, &time);
+		if (args != 2) {
+			return false;
+		}
+		update_conversation_history(history, name, time);
+	}
+
+	fclose(file);
+	return true;
 }
 
 History *init_history(const char *filename) {
