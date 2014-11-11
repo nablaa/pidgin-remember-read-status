@@ -13,40 +13,40 @@
 
 static gboolean
 plugin_load(PurplePlugin *plugin) {
-    return TRUE;
+	return TRUE;
 }
 
 static PurplePluginInfo info = {
-    PURPLE_PLUGIN_MAGIC,
-    PURPLE_MAJOR_VERSION,
-    PURPLE_MINOR_VERSION,
-    PURPLE_PLUGIN_STANDARD,
-    PIDGIN_PLUGIN_TYPE,
-    0,
-    NULL,
-    PURPLE_PRIORITY_DEFAULT,
+	PURPLE_PLUGIN_MAGIC,
+	PURPLE_MAJOR_VERSION,
+	PURPLE_MINOR_VERSION,
+	PURPLE_PLUGIN_STANDARD,
+	PIDGIN_PLUGIN_TYPE,
+	0,
+	NULL,
+	PURPLE_PRIORITY_DEFAULT,
 
-    "gtk-nablaa-conversation-last-said-memory",
-    "Conversion last said memory",
-    PLUGIN_VERSION,
+	"gtk-nablaa-conversation-last-said-memory",
+	"Conversion last said memory",
+	PLUGIN_VERSION,
 
-    "TODO",
-    "TODO",
-    "Miika-Petteri Matikainen <miikapetteri@gmail.com>",
-    "TODO",
+	"TODO",
+	"TODO",
+	"Miika-Petteri Matikainen <miikapetteri@gmail.com>",
+	"TODO",
 
-    plugin_load,
-    NULL,
-    NULL,
+	plugin_load,
+	NULL,
+	NULL,
 
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL
 };
 
 static void
