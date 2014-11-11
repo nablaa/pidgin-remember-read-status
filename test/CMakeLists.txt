@@ -1,5 +1,7 @@
 include_directories(
     ../include
+    ../src
+    ${GLIB_INCLUDE_DIRS}
     )
 
 add_library(conversation_history_test test_conversation_history.cc)
