@@ -8,7 +8,9 @@ TEST_GROUP(ConversationHistoryTests)
 {
 };
 
-TEST(ConversationHistoryTests, TempTest)
+TEST(ConversationHistoryTests, init_with_null_filename_should_return_null)
 {
-	FAIL("Fail me!");
+	History *history = init_history(NULL);
+	History *expected = NULL;
+	CHECK_EQUAL(expected, history);
 }

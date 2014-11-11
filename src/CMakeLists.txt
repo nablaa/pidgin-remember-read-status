@@ -6,6 +6,7 @@ include_directories(
     ${GTK_INCLUDE_DIRS}
     )
 
+add_library(conversation_history conversation_history.c)
 add_library(conv_memory SHARED conv_memory.c)
 
 target_link_libraries(conv_memory
