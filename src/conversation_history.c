@@ -44,6 +44,36 @@ static bool read_history_from_file(const char *filename, History *history) {
 	return true;
 }
 
+static bool write_history_to_file(const char *filename, const History *history) {
+	FILE *file = fopen(filename, "w");
+	if (!file) {
+		return false;
+	}
+
+	GHashTableIter iter;
+	gpointer key;
+	gpointer value;
+
+	g_hash_table_iter_init(&iter, history->table);
+	while (g_hash_table_iter_next(&iter, &key, &value)) {
+		fprintf(file, "%s\t%lu\n", (const char *)key, (time_t)value);
+	}
+
+	fclose(file);
+	return true;
+}
+
+static void print_history(const History *history) {
+	GHashTableIter iter;
+	gpointer key;
+	gpointer value;
+
+	g_hash_table_iter_init(&iter, history->table);
+	while (g_hash_table_iter_next(&iter, &key, &value)) {
+		printf("Name: \"%s\" timestamp: %lu\n", (const char *)key, (time_t)value);
+	}
+}
+
 History *init_history(const char *filename) {
 	return NULL;
 }

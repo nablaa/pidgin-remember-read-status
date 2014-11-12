@@ -123,3 +123,27 @@ TEST(ConversationHistoryTests, reading_history_from_file_should_return_proper_un
 	CHECK_EQUAL(true, has_conversation_unseen_messages(history, "baz", 342));
 	CHECK_EQUAL(false, has_conversation_unseen_messages(history, "none", 1234));
 }
+
+TEST(ConversationHistoryTests, writing_history_to_file_should_be_readable)
+{
+	const char *filename = "history_data";
+	update_with_malloc_string(history, "foo", 1234);
+	update_with_malloc_string(history, "bar", 42);
+	update_with_malloc_string(history, "baz", 4433);
+	update_with_malloc_string(history, "abc", 1234);
+
+	CHECK_EQUAL(true, write_history_to_file(filename, history));
+	History *new_history = create_mock_history();
+	CHECK_EQUAL(true, read_history_from_file(filename, new_history));
+
+	CHECK_EQUAL(false, has_conversation_unseen_messages(new_history, "foo", 1234));
+	CHECK_EQUAL(false, has_conversation_unseen_messages(new_history, "bar", 42));
+	CHECK_EQUAL(false, has_conversation_unseen_messages(new_history, "baz", 4433));
+	CHECK_EQUAL(false, has_conversation_unseen_messages(new_history, "abc", 1234));
+
+	CHECK_EQUAL(true, has_conversation_unseen_messages(new_history, "foo", 4433));
+	CHECK_EQUAL(true, has_conversation_unseen_messages(new_history, "bar", 4433));
+	CHECK_EQUAL(true, has_conversation_unseen_messages(new_history, "baz", 1234));
+	CHECK_EQUAL(true, has_conversation_unseen_messages(new_history, "abc", 42));
+	destroy_mock_history(new_history);
+}
