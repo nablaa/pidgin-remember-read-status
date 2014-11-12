@@ -79,8 +79,8 @@ History *init_history(const char *filename) {
 }
 
 bool has_conversation_unseen_messages(const History *history,
-		                      const char *conversation_name,
-				      time_t message_time) {
+                                      const char *conversation_name,
+                                      time_t message_time) {
 	if (!history || !conversation_name) {
 		return false;
 	}
@@ -95,8 +95,8 @@ bool has_conversation_unseen_messages(const History *history,
 }
 
 void update_conversation_history(History *history,
-		                 const char *conversation_name,
-				 time_t message_time) {
+                                 const char *conversation_name,
+                                 time_t message_time) {
 	assert(history);
 	GHashTable *table = history->table;
 	g_hash_table_insert(table, (gpointer)conversation_name, GINT_TO_POINTER(message_time));
