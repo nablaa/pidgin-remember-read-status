@@ -87,6 +87,12 @@ static void print_history(const History *history) {
 	}
 }
 
+static void free_history(History *history) {
+	destroy_hash_table(history);
+	destroy_filename(history);
+	free(history);
+}
+
 History *init_history(const char *filename) {
 	if (!filename) {
 		return NULL;
@@ -96,9 +102,7 @@ History *init_history(const char *filename) {
 	init_filename(history, filename);
 
 	if (!read_history_from_file(history->filename, history)) {
-		destroy_hash_table(history);
-		destroy_filename(history);
-		free(history);
+		free_history(history);
 		return NULL;
 	}
 	return history;
@@ -109,10 +113,7 @@ void deinit_history(History *history) {
 		return;
 	}
 	write_history_to_file(history->filename, history);
-
-	destroy_hash_table(history);
-	destroy_filename(history);
-	free(history);
+	free_history(history);
 }
 
 bool has_conversation_unseen_messages(const History *history,
