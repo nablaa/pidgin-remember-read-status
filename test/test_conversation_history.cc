@@ -20,6 +20,13 @@ TEST(ConversationHistoryInitTests, init_with_null_filename_should_return_null)
 	CHECK_EQUAL(expected, history);
 }
 
+TEST(ConversationHistoryInitTests, deinit_after_init_should_succeed)
+{
+	History *history = init_history("history_data");
+	CHECK(history != NULL);
+	deinit_history(history);
+}
+
 History *create_mock_history() {
 	History *history = (History *)malloc(sizeof(History));
 	init_hash_table(history);

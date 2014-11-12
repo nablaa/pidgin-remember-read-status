@@ -6,9 +6,11 @@
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdlib.h>
 
 struct History {
-	FILE *file;
+	char *filename;
 	GHashTable *table;
 };
 
@@ -20,6 +22,17 @@ static void init_hash_table(History *history) {
 static void destroy_hash_table(History *history) {
 	g_hash_table_destroy(history->table);
 	history->table = NULL;
+}
+
+static void init_filename(History *history, const char *filename) {
+	size_t size = strlen(filename) + 1;
+	history->filename = (char *)malloc(size);
+	strncpy(history->filename, filename, size);
+}
+
+static void destroy_filename(History *history) {
+	free(history->filename);
+	history->filename = NULL;
 }
 
 static bool read_history_from_file(const char *filename, History *history) {
@@ -75,7 +88,31 @@ static void print_history(const History *history) {
 }
 
 History *init_history(const char *filename) {
-	return NULL;
+	if (!filename) {
+		return NULL;
+	}
+	History *history = (History *)malloc(sizeof(History));
+	init_hash_table(history);
+	init_filename(history, filename);
+
+	if (!read_history_from_file(history->filename, history)) {
+		destroy_hash_table(history);
+		destroy_filename(history);
+		free(history);
+		return NULL;
+	}
+	return history;
+}
+
+void deinit_history(History *history) {
+	if (!history) {
+		return;
+	}
+	write_history_to_file(history->filename, history);
+
+	destroy_hash_table(history);
+	destroy_filename(history);
+	free(history);
 }
 
 bool has_conversation_unseen_messages(const History *history,
