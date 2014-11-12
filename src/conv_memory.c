@@ -15,6 +15,27 @@
 #define PLUGIN_ID "gtk-nablaa-conversation-last-said-memory"
 #define PLUGIN_VERSION "0.1-dev"
 
+static bool is_disconnect_message(const char *msg) {
+	return strstr(msg, "The account has disconnected and you are no longer in this chat.") != NULL;
+}
+
+static time_t get_latest_conversation_message_timestamp(PurpleConversation *conv) {
+	time_t time = 0;
+	GList *history_list = purple_conversation_get_message_history(conv);
+	for (GList *l = history_list; l != NULL; l = l->next) {
+		PurpleConvMessage *message = (PurpleConvMessage *)l->data;
+		const char *msg = purple_conversation_message_get_message(message);
+		time = purple_conversation_message_get_timestamp(message);
+
+		// Skip disconnect messages
+		if (is_disconnect_message(msg)) {
+			continue;
+		}
+		break;
+	}
+	return time;
+}
+
 static void chat_joined_cb(PurpleConversation *conv) {
 	const char *conv_name = purple_conversation_get_name (conv);
 	purple_debug_misc(PLUGIN_ID, "CALLBACK (%s): chat joined\n", conv_name);
