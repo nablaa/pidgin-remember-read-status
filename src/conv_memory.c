@@ -7,12 +7,112 @@
 #include "version.h"
 #include "gtkplugin.h"
 #include "gtkconv.h"
+#include "debug.h"
 
+#include <stdbool.h>
+#include <string.h>
+
+#define PLUGIN_ID "gtk-nablaa-conversation-last-said-memory"
 #define PLUGIN_VERSION "0.1-dev"
 
+static void chat_joined_cb(PurpleConversation *conv) {
+	const char *conv_name = purple_conversation_get_name (conv);
+	purple_debug_misc(PLUGIN_ID, "CALLBACK (%s): chat joined\n", conv_name);
+}
 
-static gboolean
-plugin_load(PurplePlugin *plugin) {
+static void chat_left_cb(PurpleConversation *conv) {
+	const char *conv_name = purple_conversation_get_name (conv);
+	purple_debug_misc(PLUGIN_ID, "CALLBACK (%s): chat left\n", conv_name);
+}
+
+static void conversation_created_cb(PurpleConversation *conv) {
+	const char *conv_name = purple_conversation_get_name (conv);
+	purple_debug_misc(PLUGIN_ID, "CALLBACK (%s): conversation created\n", conv_name);
+}
+
+static void conversation_updated_cb(PurpleConversation *conv, PurpleConvUpdateType type) {
+	const char *conv_name = purple_conversation_get_name (conv);
+	purple_debug_misc(PLUGIN_ID, "CALLBACK (%s): conversation updated, type: %d\n", conv_name, type);
+	switch (type) {
+		case PURPLE_CONV_UPDATE_ADD:
+			purple_debug_misc(PLUGIN_ID, "UPDATE_ADD\n");
+			break;
+		case PURPLE_CONV_UPDATE_REMOVE:
+			purple_debug_misc(PLUGIN_ID, "UPDATE_REMOVE\n");
+			break;
+		case PURPLE_CONV_UPDATE_ACCOUNT:
+			purple_debug_misc(PLUGIN_ID, "UPDATE_ACCOUNT\n");
+			break;
+		case PURPLE_CONV_UPDATE_TYPING:
+			purple_debug_misc(PLUGIN_ID, "UPDATE_TYPING\n");
+			break;
+		case PURPLE_CONV_UPDATE_UNSEEN:
+			purple_debug_misc(PLUGIN_ID, "UPDATE_UNSEEN\n");
+			break;
+		case PURPLE_CONV_UPDATE_LOGGING:
+			purple_debug_misc(PLUGIN_ID, "UPDATE_LOGGING\n");
+			break;
+		case PURPLE_CONV_UPDATE_TOPIC:
+			purple_debug_misc(PLUGIN_ID, "UPDATE_TOPIC\n");
+			break;
+		case PURPLE_CONV_ACCOUNT_ONLINE:
+			purple_debug_misc(PLUGIN_ID, "ACCOUNT_ONLINE\n");
+			break;
+		case PURPLE_CONV_ACCOUNT_OFFLINE:
+			purple_debug_misc(PLUGIN_ID, "ACCOUNT_OFFLINE\n");
+			break;
+		case PURPLE_CONV_UPDATE_AWAY:
+			purple_debug_misc(PLUGIN_ID, "UPDATE_AWAY\n");
+			break;
+		case PURPLE_CONV_UPDATE_ICON:
+			purple_debug_misc(PLUGIN_ID, "UPDATE_ICON\n");
+			break;
+		case PURPLE_CONV_UPDATE_TITLE:
+			purple_debug_misc(PLUGIN_ID, "UPDATE_TITLE\n");
+			break;
+		case PURPLE_CONV_UPDATE_CHATLEFT:
+			purple_debug_misc(PLUGIN_ID, "UPDATE_CHATLEFT\n");
+			break;
+		case PURPLE_CONV_UPDATE_FEATURES:
+			purple_debug_misc(PLUGIN_ID, "UPDATE_FEATURES\n");
+			break;
+		default:
+			purple_debug_misc(PLUGIN_ID, "UPDATE_UNKOWN\n");
+			break;
+    }
+
+}
+
+static void received_chat_msg_cb(PurpleAccount *account, char *sender, char *message,
+                          PurpleConversation *conv, PurpleMessageFlags flags) {
+	const char *conv_name = purple_conversation_get_name (conv);
+	purple_debug_misc(PLUGIN_ID, "CALLBACK (%s): received chat msg\n", conv_name);
+}
+
+
+static gboolean plugin_load(PurplePlugin *plugin) {
+	void *convs_handle;
+	convs_handle = purple_conversations_get_handle();
+
+	purple_signal_connect(convs_handle, "chat-joined", plugin,
+	                      PURPLE_CALLBACK(chat_joined_cb), NULL);
+
+	purple_signal_connect(convs_handle, "chat-left", plugin,
+	                      PURPLE_CALLBACK(chat_left_cb), NULL);
+
+	purple_signal_connect(convs_handle, "conversation-created", plugin,
+	                      PURPLE_CALLBACK(conversation_created_cb), NULL);
+
+	purple_signal_connect(convs_handle, "conversation-updated", plugin,
+	                      PURPLE_CALLBACK(conversation_updated_cb), NULL);
+
+	purple_signal_connect(convs_handle, "received-chat-msg", plugin,
+	                      PURPLE_CALLBACK(received_chat_msg_cb), NULL);
+
+	return TRUE;
+}
+
+static gboolean plugin_unload(PurplePlugin *plugin) {
 	return TRUE;
 }
 
@@ -26,7 +126,7 @@ static PurplePluginInfo info = {
 	NULL,
 	PURPLE_PRIORITY_DEFAULT,
 
-	"gtk-nablaa-conversation-last-said-memory",
+	PLUGIN_ID,
 	"Conversion last said memory",
 	PLUGIN_VERSION,
 
@@ -36,7 +136,7 @@ static PurplePluginInfo info = {
 	"TODO",
 
 	plugin_load,
-	NULL,
+	plugin_unload,
 	NULL,
 
 	NULL,
@@ -49,8 +149,7 @@ static PurplePluginInfo info = {
 	NULL
 };
 
-static void
-init_plugin(PurplePlugin *plugin) {
+static void init_plugin(PurplePlugin *plugin) {
 }
 
 PURPLE_INIT_PLUGIN(conv_last_said_memory, init_plugin, info)
