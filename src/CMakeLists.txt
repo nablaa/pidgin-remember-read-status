@@ -7,9 +7,9 @@ include_directories(
     )
 
 add_library(conversation_history conversation_history.c)
-add_library(conv_memory SHARED conv_memory.c)
+add_library(remember_read_status SHARED remember_read_status.c)
 
-target_link_libraries(conv_memory
+target_link_libraries(remember_read_status
     ${PIDGIN_LIBRARIES}
     ${LIBPURPLE_LIBRARIES}
     ${GLIB_LIBRARIES}
@@ -17,4 +17,4 @@ target_link_libraries(conv_memory
     )
 
 set(PLUGIN_INSTALL_DIR "~/.purple/plugins/")
-install(TARGETS conv_memory DESTINATION "${PLUGIN_INSTALL_DIR}")
+install(TARGETS remember_read_status DESTINATION "${PLUGIN_INSTALL_DIR}")

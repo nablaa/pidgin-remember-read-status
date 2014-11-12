@@ -12,7 +12,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define PLUGIN_ID "gtk-nablaa-conversation-last-said-memory"
+#define PLUGIN_ID "gtk-nablaa-remember-read-status"
 #define PLUGIN_VERSION "0.1-dev"
 
 static bool is_disconnect_message(const char *msg) {
@@ -148,13 +148,13 @@ static PurplePluginInfo info = {
 	PURPLE_PRIORITY_DEFAULT,
 
 	PLUGIN_ID,
-	"Conversion last said memory",
+	"Remember read status",
 	PLUGIN_VERSION,
 
-	"TODO",
-	"TODO",
+	"TODO summary",
+	"TODO description",
 	"Miika-Petteri Matikainen <miikapetteri@gmail.com>",
-	"TODO",
+	"TODO website",
 
 	plugin_load,
 	plugin_unload,

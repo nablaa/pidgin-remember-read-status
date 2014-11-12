@@ -1,16 +1,19 @@
-# Conversation last said memory
-
+# Piding remember read status plugin
 
 ## Installation
 
 	mkdir build
+	cd build
 	cmake ..
 	make
 	make install
 
+Enable plugin *Remember read status* from Pidgin plugins list.
+
 ## Running unit tests
 
 	mkdir build
+	cd build
 	cmake -DCMAKE_BUILD_TYPE=Debug ..
 	make
 	make test

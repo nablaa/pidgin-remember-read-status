@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.7)
-project(pidgin-conversation-memory)
+project(pidgin-remember-read-status)
 enable_testing()
 
 find_package(PkgConfig REQUIRED)
