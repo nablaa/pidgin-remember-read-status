@@ -16,7 +16,6 @@ cppcheck \
     --quiet \
     -Iinclude \
     -Isrc \
-    -I/usr/include \
     $(pkg-config --cflags-only-I glib-2.0) \
     $(pkg-config --cflags-only-I gtk+-2.0) \
     $(pkg-config --cflags-only-I pidgin) \
