@@ -10,7 +10,6 @@ cppcheck \
     --enable=all \
     --inconclusive \
     --std=c99 \
-    --force \
     --suppress=missingIncludeSystem \
     --error-exitcode=1 \
     --quiet \
