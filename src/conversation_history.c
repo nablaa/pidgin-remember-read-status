@@ -95,6 +95,13 @@ static void free_history(History *history) {
 	free(history);
 }
 
+static void create_file_if_it_doesnt_exist(const char *filename) {
+	FILE *file = fopen(filename, "ab+");
+	if (file) {
+		fclose(file);
+	}
+}
+
 History *init_history(const char *filename) {
 	if (!filename) {
 		return NULL;
@@ -103,6 +110,7 @@ History *init_history(const char *filename) {
 	init_hash_table(history);
 	init_filename(history, filename);
 
+	create_file_if_it_doesnt_exist(history->filename);
 	if (!read_history_from_file(history->filename, history)) {
 		free_history(history);
 		return NULL;
