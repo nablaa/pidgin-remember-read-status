@@ -137,9 +137,9 @@ bool is_conversation_in_history(const History *history,
 	return value != NULL;
 }
 
-bool has_conversation_unseen_messages(const History *history,
-                                      const char *conversation_name,
-                                      time_t message_time) {
+bool has_conversation_history_unseen_messages(const History *history,
+                                              const char *conversation_name,
+                                              time_t message_time) {
 	if (!is_conversation_in_history(history, conversation_name)) {
 		return false;
 	}

@@ -13,9 +13,9 @@ void deinit_history(History *history);
 bool is_conversation_in_history(const History *history,
                                 const char *conversation_name);
 
-bool has_conversation_unseen_messages(const History *history,
-                                      const char *conversation_name,
-                                      time_t message_time);
+bool has_conversation_history_unseen_messages(const History *history,
+                                              const char *conversation_name,
+                                              time_t message_time);
 
 void update_conversation_history(History *history,
                                  const char *conversation_name,

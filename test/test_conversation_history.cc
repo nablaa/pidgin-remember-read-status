@@ -68,16 +68,16 @@ TEST_GROUP(ConversationHistoryTests)
 	}
 };
 
-TEST(ConversationHistoryTests, has_conversation_unseen_messages_with_null_should_return_false)
+TEST(ConversationHistoryTests, has_conversation_history_unseen_messages_with_null_should_return_false)
 {
-	CHECK_EQUAL(false, has_conversation_unseen_messages(NULL, "foo", 1234));
-	CHECK_EQUAL(false, has_conversation_unseen_messages(history, NULL, 1234));
+	CHECK_EQUAL(false, has_conversation_history_unseen_messages(NULL, "foo", 1234));
+	CHECK_EQUAL(false, has_conversation_history_unseen_messages(history, NULL, 1234));
 }
 
 TEST(ConversationHistoryTests, empty_history_should_not_have_unseen_messages)
 {
-	CHECK_EQUAL(false, has_conversation_unseen_messages(history, "foo", 1234));
-	CHECK_EQUAL(false, has_conversation_unseen_messages(history, "bar", 1234));
+	CHECK_EQUAL(false, has_conversation_history_unseen_messages(history, "foo", 1234));
+	CHECK_EQUAL(false, has_conversation_history_unseen_messages(history, "bar", 1234));
 }
 
 TEST(ConversationHistoryTests, message_with_same_timestamp_should_mean_no_unseen_messages)
@@ -85,7 +85,7 @@ TEST(ConversationHistoryTests, message_with_same_timestamp_should_mean_no_unseen
 	const char *name = "foo";
 	time_t time = 1234;
 	update_with_malloc_string(history, name, time);
-	CHECK_EQUAL(false, has_conversation_unseen_messages(history, name, time));
+	CHECK_EQUAL(false, has_conversation_history_unseen_messages(history, name, time));
 }
 
 TEST(ConversationHistoryTests, message_to_different_conversation_should_mean_no_unseen_messages)
@@ -93,7 +93,7 @@ TEST(ConversationHistoryTests, message_to_different_conversation_should_mean_no_
 	const char *name = "foo";
 	time_t time = 1234;
 	update_with_malloc_string(history, "bar", 4433);
-	CHECK_EQUAL(false, has_conversation_unseen_messages(history, name, time));
+	CHECK_EQUAL(false, has_conversation_history_unseen_messages(history, name, time));
 }
 
 TEST(ConversationHistoryTests, message_to_same_conversation_should_indicate_unseen_messages)
@@ -101,7 +101,7 @@ TEST(ConversationHistoryTests, message_to_same_conversation_should_indicate_unse
 	const char *name = "foo";
 	time_t time = 1234;
 	update_with_malloc_string(history, name, 4433);
-	CHECK_EQUAL(true, has_conversation_unseen_messages(history, name, time));
+	CHECK_EQUAL(true, has_conversation_history_unseen_messages(history, name, time));
 }
 
 TEST(ConversationHistoryTests, updating_conversation_after_unseen_messages_should_give_no_unseen_messages)
@@ -110,11 +110,11 @@ TEST(ConversationHistoryTests, updating_conversation_after_unseen_messages_shoul
 	time_t time = 1234;
 	time_t new_time = 4433;
 	update_with_malloc_string(history, name, new_time);
-	CHECK_EQUAL(false, has_conversation_unseen_messages(history, name, new_time));
-	CHECK_EQUAL(true, has_conversation_unseen_messages(history, name, time));
+	CHECK_EQUAL(false, has_conversation_history_unseen_messages(history, name, new_time));
+	CHECK_EQUAL(true, has_conversation_history_unseen_messages(history, name, time));
 	update_with_malloc_string(history, name, time);
-	CHECK_EQUAL(true, has_conversation_unseen_messages(history, name, new_time));
-	CHECK_EQUAL(false, has_conversation_unseen_messages(history, name, time));
+	CHECK_EQUAL(true, has_conversation_history_unseen_messages(history, name, new_time));
+	CHECK_EQUAL(false, has_conversation_history_unseen_messages(history, name, time));
 }
 
 TEST(ConversationHistoryTests, reading_history_from_file_should_return_proper_unseen_status)
@@ -122,13 +122,13 @@ TEST(ConversationHistoryTests, reading_history_from_file_should_return_proper_un
 	const char *filename = "history_data";
 	write_test_file(filename);
 	CHECK_EQUAL(true, read_history_from_file(filename, history));
-	CHECK_EQUAL(false, has_conversation_unseen_messages(history, "foo", 1234));
-	CHECK_EQUAL(false, has_conversation_unseen_messages(history, "bar", 42));
-	CHECK_EQUAL(false, has_conversation_unseen_messages(history, "baz", 999));
-	CHECK_EQUAL(true, has_conversation_unseen_messages(history, "foo", 42));
-	CHECK_EQUAL(true, has_conversation_unseen_messages(history, "bar", 1234));
-	CHECK_EQUAL(true, has_conversation_unseen_messages(history, "baz", 342));
-	CHECK_EQUAL(false, has_conversation_unseen_messages(history, "none", 1234));
+	CHECK_EQUAL(false, has_conversation_history_unseen_messages(history, "foo", 1234));
+	CHECK_EQUAL(false, has_conversation_history_unseen_messages(history, "bar", 42));
+	CHECK_EQUAL(false, has_conversation_history_unseen_messages(history, "baz", 999));
+	CHECK_EQUAL(true, has_conversation_history_unseen_messages(history, "foo", 42));
+	CHECK_EQUAL(true, has_conversation_history_unseen_messages(history, "bar", 1234));
+	CHECK_EQUAL(true, has_conversation_history_unseen_messages(history, "baz", 342));
+	CHECK_EQUAL(false, has_conversation_history_unseen_messages(history, "none", 1234));
 }
 
 TEST(ConversationHistoryTests, writing_history_to_file_should_be_readable)
@@ -143,15 +143,15 @@ TEST(ConversationHistoryTests, writing_history_to_file_should_be_readable)
 	History *new_history = create_mock_history();
 	CHECK_EQUAL(true, read_history_from_file(filename, new_history));
 
-	CHECK_EQUAL(false, has_conversation_unseen_messages(new_history, "foo", 1234));
-	CHECK_EQUAL(false, has_conversation_unseen_messages(new_history, "bar", 42));
-	CHECK_EQUAL(false, has_conversation_unseen_messages(new_history, "baz", 4433));
-	CHECK_EQUAL(false, has_conversation_unseen_messages(new_history, "abc", 1234));
+	CHECK_EQUAL(false, has_conversation_history_unseen_messages(new_history, "foo", 1234));
+	CHECK_EQUAL(false, has_conversation_history_unseen_messages(new_history, "bar", 42));
+	CHECK_EQUAL(false, has_conversation_history_unseen_messages(new_history, "baz", 4433));
+	CHECK_EQUAL(false, has_conversation_history_unseen_messages(new_history, "abc", 1234));
 
-	CHECK_EQUAL(true, has_conversation_unseen_messages(new_history, "foo", 4433));
-	CHECK_EQUAL(true, has_conversation_unseen_messages(new_history, "bar", 4433));
-	CHECK_EQUAL(true, has_conversation_unseen_messages(new_history, "baz", 1234));
-	CHECK_EQUAL(true, has_conversation_unseen_messages(new_history, "abc", 42));
+	CHECK_EQUAL(true, has_conversation_history_unseen_messages(new_history, "foo", 4433));
+	CHECK_EQUAL(true, has_conversation_history_unseen_messages(new_history, "bar", 4433));
+	CHECK_EQUAL(true, has_conversation_history_unseen_messages(new_history, "baz", 1234));
+	CHECK_EQUAL(true, has_conversation_history_unseen_messages(new_history, "abc", 42));
 	destroy_mock_history(new_history);
 }
 
