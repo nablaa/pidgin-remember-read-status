@@ -154,3 +154,21 @@ TEST(ConversationHistoryTests, writing_history_to_file_should_be_readable)
 	CHECK_EQUAL(true, has_conversation_unseen_messages(new_history, "abc", 42));
 	destroy_mock_history(new_history);
 }
+
+TEST(ConversationHistoryTests, non_existing_conversation_should_not_be_in_history)
+{
+	CHECK_EQUAL(false, is_conversation_in_history(history, "foo"));
+	CHECK_EQUAL(false, is_conversation_in_history(history, "bar"));
+}
+
+TEST(ConversationHistoryTests, conversation_should_be_in_history_after_update)
+{
+	CHECK_EQUAL(false, is_conversation_in_history(history, "foo"));
+	CHECK_EQUAL(false, is_conversation_in_history(history, "bar"));
+	update_with_malloc_string(history, "foo", 1);
+	CHECK_EQUAL(true, is_conversation_in_history(history, "foo"));
+	CHECK_EQUAL(false, is_conversation_in_history(history, "bar"));
+	update_with_malloc_string(history, "bar", 1);
+	CHECK_EQUAL(true, is_conversation_in_history(history, "foo"));
+	CHECK_EQUAL(true, is_conversation_in_history(history, "bar"));
+}

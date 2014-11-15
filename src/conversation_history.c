@@ -126,10 +126,21 @@ void deinit_history(History *history) {
 	free_history(history);
 }
 
+bool is_conversation_in_history(const History *history,
+                                const char *conversation_name) {
+	if (!history || !conversation_name) {
+		return false;
+	}
+
+	GHashTable *table = history->table;
+	gpointer value = g_hash_table_lookup(table, conversation_name);
+	return value != NULL;
+}
+
 bool has_conversation_unseen_messages(const History *history,
                                       const char *conversation_name,
                                       time_t message_time) {
-	if (!history || !conversation_name) {
+	if (!is_conversation_in_history(history, conversation_name)) {
 		return false;
 	}
 
