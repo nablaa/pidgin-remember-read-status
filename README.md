@@ -1,5 +1,7 @@
 # Piding remember read status plugin
 
+[![Build Status](https://travis-ci.org/nablaa/pidgin-remember-read-status.svg?branch=master)](https://travis-ci.org/nablaa/pidgin-remember-read-status)
+
 This plugin will remember the read status of chat conversations when
 disconnecting from a chat. Without this plugin, when connecting to a chat
 room, the chat room will be shown as if there are unseen messages even if
