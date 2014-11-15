@@ -1,5 +1,7 @@
 #define PURPLE_PLUGINS
 
+#include "conversation_history.h"
+
 #include <glib.h>
 
 #include "notify.h"
@@ -9,131 +11,189 @@
 #include "gtkconv.h"
 #include "debug.h"
 
+#include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
 
 #define PLUGIN_ID "gtk-nablaa-remember-read-status"
 #define PLUGIN_VERSION "0.1-dev"
+#define HISTORY_FILENAME ".pidgin-remember-read-status-history"
+
+static History *history = NULL;
 
 static bool is_disconnect_message(const char *msg) {
 	return strstr(msg, "The account has disconnected and you are no longer in this chat.") != NULL;
 }
 
 static time_t get_latest_conversation_message_timestamp(PurpleConversation *conv) {
-	time_t time = 0;
+	time_t latest = 0;
 	GList *history_list = purple_conversation_get_message_history(conv);
 	for (GList *l = history_list; l != NULL; l = l->next) {
 		PurpleConvMessage *message = (PurpleConvMessage *)l->data;
 		const char *msg = purple_conversation_message_get_message(message);
-		time = purple_conversation_message_get_timestamp(message);
+		time_t time = purple_conversation_message_get_timestamp(message);
 
 		// Skip disconnect messages
 		if (is_disconnect_message(msg)) {
 			continue;
 		}
-		break;
+
+		if (latest == 0 || time > latest) {
+			latest = time;
+		}
 	}
-	return time;
+	return latest;
 }
 
-static void chat_joined_cb(PurpleConversation *conv) {
-	const char *conv_name = purple_conversation_get_name (conv);
-	purple_debug_misc(PLUGIN_ID, "CALLBACK (%s): chat joined\n", conv_name);
+static bool are_unseen_messages_in_conversation(PurpleConversation *conv) {
+	gpointer count_data = purple_conversation_get_data(conv, "unseen-count");
+	gpointer state_data = purple_conversation_get_data(conv, "unseen-state");
+	int unseen_count = 0;
+	PidginUnseenState unseen_state = PIDGIN_UNSEEN_NONE;
+
+	if (count_data) {
+		unseen_count = GPOINTER_TO_INT(count_data);
+	}
+	if (state_data) {
+		unseen_state = GPOINTER_TO_INT(state_data);
+	}
+
+	return unseen_count != 0 ||
+		(unseen_state != PIDGIN_UNSEEN_NONE && unseen_state != PIDGIN_UNSEEN_EVENT);
 }
 
-static void chat_left_cb(PurpleConversation *conv) {
-	const char *conv_name = purple_conversation_get_name (conv);
-	purple_debug_misc(PLUGIN_ID, "CALLBACK (%s): chat left\n", conv_name);
+static void chat_left_cb(PurpleConversation *conv, const char *conv_name) {
+	if (history == NULL) {
+		purple_debug_misc(PLUGIN_ID, "%s: Cannot update conversation history: no history file\n", conv_name);
+		return;
+	}
+
+	if (are_unseen_messages_in_conversation(conv)) {
+		purple_debug_misc(PLUGIN_ID, "%s: Not updating conversation history: unseen messages in conversation\n", conv_name);
+		return;
+	}
+
+
+	time_t message_timestamp = get_latest_conversation_message_timestamp(conv);
+	if (message_timestamp == 0) {
+		purple_debug_misc(PLUGIN_ID, "%s: Not updating conversation history: no messages in chat\n", conv_name);
+		return;
+	}
+
+	size_t size = strlen(conv_name) + 1;
+	char *name = (char *)malloc(size);
+	strncpy(name, conv_name, size);
+	update_conversation_history(history, name, message_timestamp);
+	purple_debug_misc(PLUGIN_ID, "%s: Updated with timestamp: %lu\n", conv_name, message_timestamp);
 }
 
-static void conversation_created_cb(PurpleConversation *conv) {
-	const char *conv_name = purple_conversation_get_name (conv);
-	purple_debug_misc(PLUGIN_ID, "CALLBACK (%s): conversation created\n", conv_name);
+static void mark_conversation_none_unseen(PurpleConversation *conv) {
+	purple_conversation_set_data(conv, "unseen-count", GINT_TO_POINTER(0));
+	purple_conversation_set_data(conv, "unseen-state", GINT_TO_POINTER(PIDGIN_UNSEEN_NONE));
+
+	PidginConversation *gtkconv = PIDGIN_CONVERSATION(conv);
+	if (!gtkconv) {
+		return;
+	}
+
+	gtkconv->unseen_count = 0;
+	gtkconv->unseen_state = PIDGIN_UNSEEN_NONE;
+	purple_conversation_update(conv, PURPLE_CONV_UPDATE_UNSEEN);
+}
+
+static void reset_conversation_unseen_status(PurpleConversation *conv, const char *conv_name) {
+	PidginUnseenState old_state = PIDGIN_UNSEEN_NONE;
+	gpointer data = purple_conversation_get_data(conv, "unseen-state");
+	if (data) {
+		old_state = GPOINTER_TO_INT(data);
+	}
+
+	if (old_state != PIDGIN_UNSEEN_NONE) {
+		mark_conversation_none_unseen(conv);
+	}
 }
 
 static void conversation_updated_cb(PurpleConversation *conv, PurpleConvUpdateType type) {
-	const char *conv_name = purple_conversation_get_name (conv);
-	purple_debug_misc(PLUGIN_ID, "CALLBACK (%s): conversation updated, type: %d\n", conv_name, type);
-	switch (type) {
-		case PURPLE_CONV_UPDATE_ADD:
-			purple_debug_misc(PLUGIN_ID, "UPDATE_ADD\n");
-			break;
-		case PURPLE_CONV_UPDATE_REMOVE:
-			purple_debug_misc(PLUGIN_ID, "UPDATE_REMOVE\n");
-			break;
-		case PURPLE_CONV_UPDATE_ACCOUNT:
-			purple_debug_misc(PLUGIN_ID, "UPDATE_ACCOUNT\n");
-			break;
-		case PURPLE_CONV_UPDATE_TYPING:
-			purple_debug_misc(PLUGIN_ID, "UPDATE_TYPING\n");
-			break;
-		case PURPLE_CONV_UPDATE_UNSEEN:
-			purple_debug_misc(PLUGIN_ID, "UPDATE_UNSEEN\n");
-			break;
-		case PURPLE_CONV_UPDATE_LOGGING:
-			purple_debug_misc(PLUGIN_ID, "UPDATE_LOGGING\n");
-			break;
-		case PURPLE_CONV_UPDATE_TOPIC:
-			purple_debug_misc(PLUGIN_ID, "UPDATE_TOPIC\n");
-			break;
-		case PURPLE_CONV_ACCOUNT_ONLINE:
-			purple_debug_misc(PLUGIN_ID, "ACCOUNT_ONLINE\n");
-			break;
-		case PURPLE_CONV_ACCOUNT_OFFLINE:
-			purple_debug_misc(PLUGIN_ID, "ACCOUNT_OFFLINE\n");
-			break;
-		case PURPLE_CONV_UPDATE_AWAY:
-			purple_debug_misc(PLUGIN_ID, "UPDATE_AWAY\n");
-			break;
-		case PURPLE_CONV_UPDATE_ICON:
-			purple_debug_misc(PLUGIN_ID, "UPDATE_ICON\n");
-			break;
-		case PURPLE_CONV_UPDATE_TITLE:
-			purple_debug_misc(PLUGIN_ID, "UPDATE_TITLE\n");
-			break;
-		case PURPLE_CONV_UPDATE_CHATLEFT:
-			purple_debug_misc(PLUGIN_ID, "UPDATE_CHATLEFT\n");
-			break;
-		case PURPLE_CONV_UPDATE_FEATURES:
-			purple_debug_misc(PLUGIN_ID, "UPDATE_FEATURES\n");
-			break;
-		default:
-			purple_debug_misc(PLUGIN_ID, "UPDATE_UNKOWN\n");
-			break;
-    }
-
+	const char *conv_name = purple_conversation_get_name(conv);
+	if (type == PURPLE_CONV_UPDATE_CHATLEFT) {
+		chat_left_cb(conv, conv_name);
+	}
 }
 
-static void received_chat_msg_cb(PurpleAccount *account, char *sender, char *message,
-                          PurpleConversation *conv, PurpleMessageFlags flags) {
+static void wrote_chat_msg_cb(PurpleAccount *account, const char *who,
+                              char *message, PurpleConversation *conv,
+                              PurpleMessageFlags flags) {
 	const char *conv_name = purple_conversation_get_name (conv);
-	purple_debug_misc(PLUGIN_ID, "CALLBACK (%s): received chat msg\n", conv_name);
+	if (history == NULL) {
+		purple_debug_misc(PLUGIN_ID, "%s: Cannot check unseen status: no history file\n", conv_name);
+		return;
+	}
+
+	time_t message_timestamp = get_latest_conversation_message_timestamp(conv);
+	if (message_timestamp == 0) {
+		purple_debug_misc(PLUGIN_ID, "%s: No messages in chat, marking chat read\n", conv_name);
+		reset_conversation_unseen_status(conv, conv_name);
+		return;
+	}
+
+	if (!is_conversation_in_history(history, conv_name)) {
+		purple_debug_misc(PLUGIN_ID, "%s: No history for conversation, skipping unseen status fixing\n", conv_name);
+		return;
+	}
+
+	bool has_unseen = has_conversation_history_unseen_messages(history, conv_name, message_timestamp);
+	if (!has_unseen) {
+		purple_debug_misc(PLUGIN_ID, "%s: No unseen messages in conversation, marking as read\n", conv_name);
+		reset_conversation_unseen_status(conv, conv_name);
+	} else {
+		purple_debug_misc(PLUGIN_ID, "%s: Unseen messages in conversation, not modifying unseen status\n", conv_name);
+	}
 }
 
+static char *get_history_filepath(void) {
+	char *home_directory = getenv("HOME");
+	if (home_directory == NULL) {
+		return NULL;
+	}
+
+	size_t directory_length = strlen(home_directory);
+	size_t filename_length = strlen(HISTORY_FILENAME);
+	size_t size = directory_length + 1 + filename_length + 1;
+	char *filepath = malloc(size);
+	strncpy(filepath, home_directory, directory_length);
+	filepath[directory_length] = '/';
+	strncpy(filepath + directory_length + 1, HISTORY_FILENAME, filename_length);
+	filepath[size - 1] = '\0';
+	return filepath;
+}
 
 static gboolean plugin_load(PurplePlugin *plugin) {
+	char *filepath = get_history_filepath();
+	if (filepath == NULL) {
+		purple_debug_error(PLUGIN_ID, "Could not find HOME directory, cannot load plugin\n");
+		return FALSE;
+	}
+
+	purple_debug_misc(PLUGIN_ID, "Saving history to file %s\n", filepath);
+	history = init_history(filepath);
+	free(filepath);
+
 	void *convs_handle;
 	convs_handle = purple_conversations_get_handle();
-
-	purple_signal_connect(convs_handle, "chat-joined", plugin,
-	                      PURPLE_CALLBACK(chat_joined_cb), NULL);
-
-	purple_signal_connect(convs_handle, "chat-left", plugin,
-	                      PURPLE_CALLBACK(chat_left_cb), NULL);
-
-	purple_signal_connect(convs_handle, "conversation-created", plugin,
-	                      PURPLE_CALLBACK(conversation_created_cb), NULL);
 
 	purple_signal_connect(convs_handle, "conversation-updated", plugin,
 	                      PURPLE_CALLBACK(conversation_updated_cb), NULL);
 
-	purple_signal_connect(convs_handle, "received-chat-msg", plugin,
-	                      PURPLE_CALLBACK(received_chat_msg_cb), NULL);
+	purple_signal_connect_priority(convs_handle, "wrote-chat-msg", plugin,
+	                               PURPLE_CALLBACK(wrote_chat_msg_cb), NULL,
+	                               PURPLE_SIGNAL_PRIORITY_LOWEST);
 
 	return TRUE;
 }
 
 static gboolean plugin_unload(PurplePlugin *plugin) {
+	purple_signals_disconnect_by_handle(plugin);
+	deinit_history(history);
 	return TRUE;
 }
 

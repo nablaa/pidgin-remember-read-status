@@ -7,7 +7,7 @@ include_directories(
     )
 
 add_library(conversation_history conversation_history.c)
-add_library(remember_read_status SHARED remember_read_status.c)
+add_library(remember_read_status SHARED remember_read_status.c conversation_history)
 
 target_link_libraries(remember_read_status
     ${PIDGIN_LIBRARIES}
