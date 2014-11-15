@@ -231,7 +231,7 @@ static PurplePluginInfo info = {
 	"message, the chat will be be marked as unseen.",
 
 	"Miika-Petteri Matikainen <miikapetteri@gmail.com>",
-	"TODO website",
+	"https://github.com/nablaa/pidgin-remember-read-status",
 
 	plugin_load,
 	plugin_unload,
