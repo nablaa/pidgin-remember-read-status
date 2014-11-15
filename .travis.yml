@@ -9,7 +9,9 @@ before_install:
 
 install:
   - sudo apt-get build-dep pidgin
-  - sudo apt-get install pidgin-dev libpurple-dev cmake cpputest
+  - sudo apt-get install pidgin-dev libpurple-dev cmake
+  - wget http://weechat.org/files/tests/ubuntu/precise/amd64/libcpputest-dev_3.4-3_amd64.deb
+  - sudo dpkg -i libcpputest-dev_3.4-3_amd64.deb
 
 script:
   - mkdir build
