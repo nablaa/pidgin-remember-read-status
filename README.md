@@ -17,7 +17,7 @@ Install pre-requisite `pidgin-devel` and `libpurple-devel` packages. CMake is
 used for building and therefore it is also required. On Ubuntu:
 
 	sudo apt-get build-dep pidgin
-	sudo apt-get install pidgin-dev libpurple-dev cmake
+	sudo apt-get install pidgin-dev libpurple-dev cmake cpputest
 
 This will compile the plugin and install it to `~/.purple/plugins/`:
 
