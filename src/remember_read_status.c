@@ -211,8 +211,16 @@ static PurplePluginInfo info = {
 	"Remember read status",
 	PLUGIN_VERSION,
 
-	"TODO summary",
-	"TODO description",
+	"Remembers read status of chat conversations",
+
+	"This plugin will remember the read status of chat conversations "
+	"when disconnecting from a chat. Without this plugin, when connecting "
+	"to a chat room, the chat room will be shown as if there are unseen "
+	"messages even if you had previously seen all messages. This plugin "
+	"fixes that by remembering the last messages that have arrived to a "
+	"certain chatroom. If the user has seen previously the latest "
+	"message, the chat will be be marked as unseen.",
+
 	"Miika-Petteri Matikainen <miikapetteri@gmail.com>",
 	"TODO website",
 
