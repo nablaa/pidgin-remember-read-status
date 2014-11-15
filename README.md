@@ -1,4 +1,4 @@
-# Piding remember read status plugin
+# Pidgin remember read status plugin
 
 [![Build Status](https://travis-ci.org/nablaa/pidgin-remember-read-status.svg?branch=master)](https://travis-ci.org/nablaa/pidgin-remember-read-status)
 
