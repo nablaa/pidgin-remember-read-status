@@ -40,15 +40,15 @@ static time_t get_latest_conversation_message_timestamp(PurpleConversation *conv
 	for (GList *l = history_list; l != NULL; l = l->next) {
 		PurpleConvMessage *message = (PurpleConvMessage *)l->data;
 		const char *msg = purple_conversation_message_get_message(message);
-		time_t time = purple_conversation_message_get_timestamp(message);
+		time_t timestamp = purple_conversation_message_get_timestamp(message);
 
 		// Skip disconnect messages
 		if (is_disconnect_message(msg)) {
 			continue;
 		}
 
-		if (latest == 0 || time > latest) {
-			latest = time;
+		if (latest == 0 || timestamp > latest) {
+			latest = timestamp;
 		}
 	}
 	return latest;

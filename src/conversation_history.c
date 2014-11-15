@@ -54,14 +54,14 @@ static bool read_history_from_file(const char *filename, History *history) {
 	char buffer[max_line_len];
 	while (fgets(buffer, max_line_len, file)) {
 		char *name = (char *)malloc(max_line_len);
-		time_t time;
-		int args = sscanf(buffer, "%512s\t%32lu", name, &time);
+		time_t timestamp;
+		int args = sscanf(buffer, "%512s\t%32lu", name, &timestamp);
 		if (args != 2) {
 			free(name);
 			fclose(file);
 			return false;
 		}
-		update_conversation_history(history, name, time);
+		update_conversation_history(history, name, timestamp);
 	}
 
 	fclose(file);
