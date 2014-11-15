@@ -41,4 +41,6 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -O0 -g3 -ggdb")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS} -O2")
 
 add_subdirectory(src)
-add_subdirectory(test)
+if ("${CMAKE_BUILD_TYPE}" MATCHES "Debug")
+    add_subdirectory(test)
+endif()
