@@ -9,7 +9,7 @@ before_install:
 
 install:
   - sudo apt-get -qq build-dep pidgin
-  - sudo apt-get -qq install pidgin-dev libpurple-dev cmake
+  - sudo apt-get -qq install pidgin-dev libpurple-dev cmake valgrind
   - wget http://weechat.org/files/tests/ubuntu/precise/amd64/libcpputest-dev_3.4-3_amd64.deb
   - sudo dpkg -i libcpputest-dev_3.4-3_amd64.deb
 
@@ -19,3 +19,4 @@ script:
   - cmake -DCMAKE_BUILD_TYPE=Debug ..
   - make
   - make test
+  - G_SLICE=always-malloc valgrind --tool=memcheck --leak-check=yes --leak-resolution=high --num-callers=20 --track-fds=yes ./test/UnitTests
