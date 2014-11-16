@@ -9,7 +9,7 @@ you had previously seen all messages.
 
 This plugin fixes that by remembering the last messages that have arrived to
 a certain chatroom. If the user has seen previously the latest message, the
-chat will be be marked as unseen.
+chat will not be marked as unseen.
 
 ## Installation
 
@@ -45,6 +45,13 @@ Compiling and running unit tests:
 
 ### Running tests with valgrind
 
+Install pre-requisite package `valgrind`. On Ubuntu:
+
+	sudo apt-get install valgrind
+
+Running unit tests with valgrind (assuming unit tests are already built):
+
+	cd build
 	G_SLICE=always-malloc valgrind --tool=memcheck --leak-check=yes --leak-resolution=high --num-callers=20 --track-fds=yes ./test/UnitTests
 
 ## Running static code analysis
