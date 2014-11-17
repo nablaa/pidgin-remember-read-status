@@ -30,8 +30,9 @@
 
 static History *history = NULL;
 
-static bool is_disconnect_message(const char *msg) {
-	return strstr(msg, "The account has disconnected and you are no longer in this chat.") != NULL;
+static bool is_skippable_message(PurpleConvMessage *message) {
+	PurpleMessageFlags flags = purple_conversation_message_get_flags(message);
+	return (flags & PURPLE_MESSAGE_SYSTEM);
 }
 
 static time_t get_latest_conversation_message_timestamp(PurpleConversation *conv) {
@@ -42,8 +43,7 @@ static time_t get_latest_conversation_message_timestamp(PurpleConversation *conv
 		const char *msg = purple_conversation_message_get_message(message);
 		time_t timestamp = purple_conversation_message_get_timestamp(message);
 
-		// Skip disconnect messages
-		if (is_disconnect_message(msg)) {
+		if (is_skippable_message(message)) {
 			continue;
 		}
 
