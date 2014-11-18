@@ -25,7 +25,7 @@
 #include <string.h>
 
 #define PLUGIN_ID "gtk-nablaa-remember-read-status"
-#define PLUGIN_VERSION "0.1.2"
+#define PLUGIN_VERSION "0.1.2-dev"
 #define HISTORY_FILENAME ".pidgin-remember-read-status-history"
 
 static History *history = NULL;
