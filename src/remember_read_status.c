@@ -40,7 +40,6 @@ static time_t get_latest_conversation_message_timestamp(PurpleConversation *conv
 	GList *history_list = purple_conversation_get_message_history(conv);
 	for (GList *l = history_list; l != NULL; l = l->next) {
 		PurpleConvMessage *message = (PurpleConvMessage *)l->data;
-		const char *msg = purple_conversation_message_get_message(message);
 		time_t timestamp = purple_conversation_message_get_timestamp(message);
 
 		if (is_skippable_message(message)) {
@@ -132,7 +131,7 @@ static void conversation_updated_cb(PurpleConversation *conv, PurpleConvUpdateTy
 static void wrote_chat_msg_cb(PurpleAccount *account, const char *who,
                               char *message, PurpleConversation *conv,
                               PurpleMessageFlags flags) {
-	const char *conv_name = purple_conversation_get_name (conv);
+	const char *conv_name = purple_conversation_get_name(conv);
 	if (history == NULL) {
 		purple_debug_misc(PLUGIN_ID, "%s: Cannot check unseen status: no history file\n", conv_name);
 		return;
