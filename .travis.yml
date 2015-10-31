@@ -4,6 +4,10 @@ compiler:
   - clang
   - gcc
 
+env:
+  - BUILD_TYPE=Debug
+  - BUILD_TYPE=Release
+
 before_install:
   - sudo apt-get -qq update
 
@@ -16,7 +20,7 @@ install:
 script:
   - mkdir build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE=Debug ..
+  - cmake -DCMAKE_BUILD_TYPE="$BUILD_TYPE" ..
   - make
   - make test
   - G_SLICE=always-malloc valgrind --tool=memcheck --leak-check=yes --leak-resolution=high --num-callers=20 --track-fds=yes ./test/UnitTests
