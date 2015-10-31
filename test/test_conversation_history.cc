@@ -36,13 +36,13 @@ TEST(ConversationHistoryInitTests, deinit_after_init_should_succeed)
 	deinit_history(history);
 }
 
-History *create_mock_history() {
+static History *create_mock_history() {
 	History *history = (History *)malloc(sizeof(History));
 	init_hash_table(history);
 	return history;
 }
 
-void destroy_mock_history(History *history) {
+static void destroy_mock_history(History *history) {
 	destroy_hash_table(history);
 	free(history);
 }
