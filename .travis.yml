@@ -22,5 +22,5 @@ script:
   - cd build
   - cmake -DCMAKE_BUILD_TYPE="$BUILD_TYPE" ..
   - make
-  - make test
-  - G_SLICE=always-malloc valgrind --tool=memcheck --leak-check=yes --leak-resolution=high --num-callers=20 --track-fds=yes ./test/UnitTests
+  - sh -c "if [ $BUILD_TYPE = Debug ]; then make test; fi"
+  - sh -c "if [ $BUILD_TYPE = Debug ]; then G_SLICE=always-malloc valgrind --tool=memcheck --leak-check=yes --leak-resolution=high --num-callers=20 --track-fds=yes ./test/UnitTests; fi"
