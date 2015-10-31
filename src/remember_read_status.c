@@ -227,7 +227,7 @@ static PurplePluginInfo info = {
 	"messages even if you had previously seen all messages. This plugin "
 	"fixes that by remembering the last messages that have arrived to a "
 	"certain chatroom. If the user has seen previously the latest "
-	"message, the chat will be be marked as unseen.",
+	"message, the chat will not be marked as unseen.",
 
 	"Miika-Petteri Matikainen <miikapetteri@gmail.com>",
 	"https://github.com/nablaa/pidgin-remember-read-status",
