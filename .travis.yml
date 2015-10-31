@@ -1,3 +1,5 @@
+sudo: required
+dist: trusty
 language: cpp
 
 compiler:
@@ -13,9 +15,7 @@ before_install:
 
 install:
   - sudo apt-get -qq build-dep pidgin
-  - sudo apt-get -qq install pidgin-dev libpurple-dev cmake valgrind
-  - wget http://weechat.org/files/tests/ubuntu/precise/amd64/libcpputest-dev_3.4-3_amd64.deb
-  - sudo dpkg -i libcpputest-dev_3.4-3_amd64.deb
+  - sudo apt-get -qq install pidgin-dev libpurple-dev cmake valgrind libcpputest-dev
 
 script:
   - mkdir build
