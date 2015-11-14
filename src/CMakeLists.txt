@@ -1,5 +1,8 @@
 include_directories(
     ../include
+    )
+
+include_directories(SYSTEM
     ${PIDGIN_INCLUDE_DIRS}
     ${LIBPURPLE_INCLUDE_DIRS}
     ${GLIB_INCLUDE_DIRS}
